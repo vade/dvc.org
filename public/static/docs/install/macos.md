@@ -1,5 +1,7 @@
 # Installation on MacOS
 
+Testing GH edit workflow.
+
 ## Install with brew
 
 Recommended. Requires [Homebrew](https://brew.sh/).
