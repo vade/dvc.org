@@ -5,7 +5,7 @@ Remove unused objects from <abbr>cache</abbr> or remote storage.
 ## Synopsis
 
 ```usage
-usage: dvc gc [-h] [-q | -v] [-a] [-T] [-c] [-r REMOTE] [-f] [-j JOBS]
+usage: dvc gc [-h] [-q | -v] [-w] [-a] [-T] [-c] [-r REMOTE] [-f] [-j JOBS]
               [-p [REPOS [REPOS ...]]]
 ```
 
@@ -14,9 +14,13 @@ usage: dvc gc [-h] [-q | -v] [-a] [-T] [-c] [-r REMOTE] [-f] [-j JOBS]
 This command deletes (garbage collects) data files or directories that may exist
 in the cache (or [remote storage](/doc/command-reference/remote) if `-c` is
 used) but no longer referenced in [DVC-files](/doc/user-guide/dvc-file-format)
-currently in the <abbr>workspace</abbr>. By default, this command only cleans up
-the local cache, which is typically located on the same machine as the project
-in question. This usually helps to free up disk space.
+currently in the <abbr>workspace</abbr>. By default, this command won't delete
+anything at all to make it safe and explicit. However, you can use different
+flags to change the behavior.
+
+Using `--workspace` or `-w` flag, it will only clean up the local cache, which
+is typically located on the same machine as the project in question. This
+usually helps to free up disk space.
 
 There are important things to note when using Git to version the
 <abbr>project</abbr>:
@@ -42,16 +46,20 @@ restored using `dvc fetch`, as long as they have previously been uploaded with
   useful if tags are used to track "checkpoints" of an experiment or project.
   Note that both options can be combined, for example using the `-aT` flag.
 
+- `-w`, `--workspace` - remove files in local cache. _This operation is
+  dangerous._ If `--all-tags` or `--all-branches` are specified, this flag is
+  not explicitly required.
+
 - `-p`, `--projects` - if a single remote or a single cache is shared among
   different projects (e.g. a configuration like the one described
   [here](/doc/use-cases/shared-development-server)), this option can be used to
   specify a list of them (each project is a path) to keep data that is currently
   referenced from them.
 
-- `-c`, `--cloud` - also remove files in remote storage. _This operation is
-  dangerous._ It removes datasets, models, other files that are not linked in
-  the current commit (unless `-a` or `-T` are also used). The default remote is
-  used unless a specific one is given with `-r`.
+- `-c`, `--cloud` - remove files in remote storage in addition to local cache.
+  _This operation is dangerous._ It removes datasets, models, other files that
+  are not linked in the current commit (unless `-a` or `-T` are also used). The
+  default remote is used unless a specific one is given with `-r`.
 
 - `-r`, `--remote` - name of the remote storage to collect unused objects from
   if `-c` option is specified.
@@ -82,7 +90,7 @@ When you run `dvc gc` it removes all objects from cache that are not referenced
 in the <abbr>workspace</abbr> (by collecting hash values from the DVC-files):
 
 ```dvc
-$ dvc gc
+$ dvc gc --workspace
 
 '.dvc/cache/27e30965256ed4d3e71c2bf0c4caad2e' was removed
 '.dvc/cache/2e006be822767e8ba5d73ebad49ef082' was removed
